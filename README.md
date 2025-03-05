@@ -17,23 +17,20 @@ This is a **Node.js + Express** server for crawling and serving **Formula 1 race
 📂 Project Structure
 --------------------
 
-bash
-
-CopyEdit
-
+````
 📦 server
- ┣ 📂 src
- ┃ ┣ 📂 api             # API routes
- ┃ ┣ 📂 crawler         # Puppeteer crawling logic
- ┃ ┣ 📂 utils           # Helper functions and logger
- ┃ ┣ 📜 index.ts        # Main server entry point
- ┃ ┣ 📜 config.ts       # Environment configuration
- ┃ ┗ 📜 logger.ts       # Logging system
- ┣ 📜 package.json
- ┣ 📜 tsconfig.json
- ┣ 📜 .env.example
- ┗ 📜 README.md
-
+┣ 📂 src
+┃ ┣ 📂 api             # Contains API routes
+┃ ┣ 📂 crawler         # Puppeteer crawling logic
+┃ ┣ 📂 utils           # Helper functions and logging system
+┃ ┣ 📜 index.ts        # Main server entry point
+┃ ┣ 📜 config.ts       # Environment configuration
+┃ ┗ 📜 logger.ts       # Logging system
+┣ 📜 package.json      # Dependency and script configuration
+┣ 📜 tsconfig.json     # TypeScript configuration
+┣ 📜 .env.example      # Environment file example
+┗ 📜 README.md         # Project documentation
+````
 
 ⚙️ Setup & Installation
 -----------------------
@@ -46,18 +43,10 @@ CopyEdit
 
 ### 2️⃣ Clone the Repository
 
-sh
-
-CopyEdit
-
 `git clone https://github.com/your-repo/f1-crawler-server.git
 cd f1-crawler-server`
 
 ### 3️⃣ Install Dependencies
-
-sh
-
-CopyEdit
 
 `npm install  # or yarn install`
 
@@ -65,17 +54,10 @@ CopyEdit
 
 Copy the `.env.example` file and rename it to `.env`, then update values as needed:
 
-sh
-
-CopyEdit
-
 `cp .env.example .env`
 
 Edit `.env`:
 
-ini
-
-CopyEdit
 
 `PORT=3000
 WS_PORT=8080
@@ -85,17 +67,9 @@ CORS_ORIGIN=http://localhost:5173  # URL of the frontend`
 
 #### ▶ Development Mode (with auto-restart)
 
-sh
-
-CopyEdit
-
 `npm run dev  # Uses nodemon`
 
 #### ▶ Production Mode
-
-sh
-
-CopyEdit
 
 `npm start`
 
