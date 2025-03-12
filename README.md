@@ -14,6 +14,10 @@ This is a **Node.js + Express** server for crawling and serving **Formula 1 race
 -   **REST API**: Serves the crawled data for frontend consumption.
 -   **Data Storage**: Saves race results in JSON format for quick access.
 
+📦 Demo Logs
+--------------------
+<img src="./images/demo-01.png" />
+
 📂 Project Structure
 --------------------
 
