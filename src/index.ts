@@ -17,10 +17,14 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
-app.listen(env.PORT, () => {
-  logger.info(`Express server running on port ${env.PORT}`);
-  console.log(`Express server running on port ${env.PORT}`);
-});
+if (env.NODE_ENV === 'development') {
+  app.listen(env.PORT, () => {
+    logger.info(`Express server running on port ${env.PORT}`);
+    console.log(`Express server running on port ${env.PORT}`);
+  });
+}
 
 logger.info(`WebSocket server running on ws://localhost:${env.WS_PORT}/crawl`);
 console.log(`WebSocket server running on ws://localhost:${env.WS_PORT}/crawl`);
+
+export default app;
