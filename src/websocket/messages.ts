@@ -1,5 +1,5 @@
 import { WebSocket } from 'ws';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 export function sendMessage(ws: WebSocket, progress: number, message: string): void {
   console.log(`[${new Date().toISOString()}] Sending: ${progress}% - ${message}`);
