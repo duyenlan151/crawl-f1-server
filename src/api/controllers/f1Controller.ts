@@ -1,11 +1,18 @@
 import { Request, Response } from 'express';
-import { F1Metadata } from '@/core/data/types';
-import { saveData, readDataFile } from '@/core/data/storage';
-import { logger } from '@/utils/logger';
+import { F1Metadata } from './../../core/data/types';
+import { saveData, readDataFile } from './../../core/data/storage';
+import { logger } from './../../utils/logger';
 
 export async function getMetadataAndRaceData(req: Request, res: Response): Promise<void> {
   try {
     const jsonData = await readDataFile();
+
+    if (!jsonData || typeof jsonData !== 'object') {
+      logger.warn('⚠️ Metadata file is empty or invalid.');
+      res.json({ years: [], types: [], grandPrixList: [], raceData: [] });
+      return;
+    }
+
     const years = jsonData.years || [];
     const types = jsonData.types || [];
 

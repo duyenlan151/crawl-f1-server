@@ -1,11 +1,12 @@
 import puppeteer, { Page } from 'puppeteer';
-import { saveData } from '@/core/data/storage';
-import { F1Metadata } from '@/core//data/types';
-import { sendMessage } from '@/websocket/messages';
+import { saveData } from './../../core/data/storage';
+import { F1Metadata } from './../../core//data/types';
+import { sendMessage } from './../../websocket/messages';
 import { WebSocket } from 'ws';
-import { env } from '@/config';
-import { logger } from '@/utils/logger';
+import { env } from '../../config';
+import { logger } from './../../utils/logger';
 
+//
 export async function scrapeF1Results(ws: WebSocket): Promise<F1Metadata> {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
@@ -157,62 +158,114 @@ async function evaluateTableData(page: Page, year: string, type: string, gp: any
       rows.forEach((row) => {
         const columns = row.querySelectorAll('td');
         if (columns.length > 0) {
+          const grandPrixType = gp.dataValue;
           const entry: Record<string, string | null> = {
             year,
-            grandPrixType: gp.dataValue,
+            grandPrixType,
             grandPrixLink: gp.link,
           };
           if (type === "races") {
-            entry.grandPrix = columns[0]?.innerText.trim();
-            entry.date = columns[1]?.innerText.trim();
-            // entry.winner = getWinnerFromColumn(columns, 2);
-            let winnerRaces = null;
-            const tdRaces = columns[2];
-            if (tdRaces) {
-              const spans = tdRaces.querySelectorAll("span");
-              if (spans.length >= 2) {
-                winnerRaces =  `${spans[0].textContent} ${spans[1].textContent}`.trim();
+            if (!grandPrixType) {
+              entry.grandPrix = columns[0]?.innerText.trim();
+              entry.date = columns[1]?.innerText.trim();
+              // entry.winner = getWinnerFromColumn(columns, 2);
+              let winnerRaces = null;
+              const tdRaces = columns[2];
+              if (tdRaces) {
+                const spans = tdRaces.querySelectorAll("span");
+                if (spans.length >= 2) {
+                  winnerRaces =  `${spans[0].textContent} ${spans[1].textContent}`.trim();
+                }
+                winnerRaces = tdRaces?.textContent?.trim();
               }
-              winnerRaces = tdRaces?.textContent?.trim();
+              entry.winner = winnerRaces || '';
+              entry.car = columns[3]?.innerText.trim();
+              entry.laps = columns[4]?.innerText.trim();
+              entry.time = columns[5]?.innerText.trim();
+            } else {
+              entry.pos = columns[0]?.innerText.trim();
+              entry.no = columns[1]?.innerText.trim();
+              // entry.winner = getWinnerFromColumn(columns, 2);
+              let driverRaces = null;
+              const tdRaces = columns[2];
+              if (tdRaces) {
+                const spans = tdRaces.querySelectorAll("span");
+                if (spans.length >= 2) {
+                  driverRaces =  `${spans[0].textContent} ${spans[1].textContent}`.trim();
+                }
+                driverRaces = tdRaces?.textContent?.trim();
+              }
+              entry.driver = driverRaces || '';
+              entry.car = columns[3]?.innerText.trim();
+              entry.laps = columns[4]?.innerText.trim();
+              entry.time = columns[5]?.innerText.trim();
+              entry.pts = columns[6]?.innerText.trim();
             }
-            entry.winner = winnerRaces || '';
-            entry.car = columns[3]?.innerText.trim();
-            entry.laps = columns[4]?.innerText.trim();
-            entry.time = columns[5]?.innerText.trim();
           } else if (type === "drivers") {
-            entry.pos = columns[0]?.innerText.trim();
-            // entry.driver = getWinnerFromColumn(columns);
-            let driverDrivers = null;
-            const tdDrivers = columns[1];
-            if (tdDrivers) {
-              const spans = tdDrivers.querySelectorAll("span");
-              if (spans.length >= 2) {
-                driverDrivers = `${spans[0].textContent} ${spans[1].textContent}`.trim();
+            if (!grandPrixType) {
+              entry.pos = columns[0]?.innerText.trim();
+              // entry.driver = getWinnerFromColumn(columns);
+              let driverDrivers = null;
+              const tdDrivers = columns[1];
+              if (tdDrivers) {
+                const spans = tdDrivers.querySelectorAll("span");
+                if (spans.length >= 2) {
+                  driverDrivers = `${spans[0].textContent} ${spans[1].textContent}`.trim();
+                }
+                driverDrivers =  tdDrivers?.textContent?.trim();
               }
-              driverDrivers =  tdDrivers?.textContent?.trim();
+              entry.driver = driverDrivers || '';
+              entry.nationality = columns[2]?.innerText.trim();
+              entry.car = columns[3]?.innerText.trim();
+              entry.pts = columns[4]?.innerText.trim();
+            } else {
+              entry.grandPrix = columns[0]?.innerText.trim();
+              entry.date = columns[1]?.innerText.trim();
+              entry.car = columns[3]?.innerText.trim();
+              entry.position = columns[2]?.innerText.trim();
+              entry.pts = columns[4]?.innerText.trim();
             }
-            entry.driver = driverDrivers || '';
-            entry.nationality = columns[2]?.innerText.trim();
-            entry.car = columns[3]?.innerText.trim();
-            entry.pts = columns[4]?.innerText.trim();
           } else if (type === "team") {
-            entry.pos = columns[0]?.innerText.trim();
-            entry.team = columns[1]?.innerText.trim();
-            entry.pts = columns[2]?.innerText.trim();
-          } else if (type === "fastest-laps") {
-            // entry.driver = getWinnerFromColumn(columns);
-            let driverFastest = null;
-            const tdFastest = columns[1];
-            if (tdFastest) {
-              const spans = tdFastest.querySelectorAll("span");
-              if (spans.length >= 2) {
-                driverFastest = `${spans[0].textContent} ${spans[1].textContent}`.trim();
-              }
-              driverFastest =  tdFastest?.textContent?.trim();
+            if (!grandPrixType) {
+              entry.pos = columns[0]?.innerText.trim();
+              entry.team = columns[1]?.innerText.trim();
+              entry.pts = columns[2]?.innerText.trim();
+            } else {
+              entry.grandPrix = columns[0]?.innerText.trim();
+              entry.date = columns[1]?.innerText.trim();
+              entry.pts = columns[2]?.innerText.trim();
             }
-            entry.driver = driverFastest || '';
-            entry.car = columns[2]?.innerText.trim();
-            entry.time = columns[3]?.innerText.trim();
+          } else if (type === "fastest-laps") {
+            if (!grandPrixType) {
+              entry.grandPrix = columns[0]?.innerText.trim();
+              // entry.driver = getWinnerFromColumn(columns);
+              let driverFastest = null;
+              const tdFastest = columns[1];
+              if (tdFastest) {
+                const spans = tdFastest.querySelectorAll("span");
+                if (spans.length >= 2) {
+                  driverFastest = `${spans[0].textContent} ${spans[1].textContent}`.trim();
+                }
+                driverFastest =  tdFastest?.textContent?.trim();
+              }
+              entry.driver = driverFastest || '';
+              entry.car = columns[2]?.innerText.trim();
+              entry.time = columns[3]?.innerText.trim();
+            } else {
+              entry.grandPrix = columns[0]?.innerText.trim();
+              let driverFastest = null;
+              const tdFastest = columns[1];
+              if (tdFastest) {
+                const spans = tdFastest.querySelectorAll("span");
+                if (spans.length >= 2) {
+                  driverFastest = `${spans[0].textContent} ${spans[1].textContent}`.trim();
+                }
+                driverFastest =  tdFastest?.textContent?.trim();
+              }
+              entry.driver = driverFastest || '';
+              entry.car = columns[2]?.innerText.trim();
+              entry.time = columns[3]?.innerText.trim();
+            }
           }
           results.push(entry);
         }

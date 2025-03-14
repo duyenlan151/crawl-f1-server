@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
-import { env } from '@/config';
+import { env } from '../config';
 import { handleMessage } from './handlers';
-import { logger } from '@/utils/logger';
+import { logger } from './../utils/logger';
 
 export const wss = new WebSocket.Server({ port: env.WS_PORT as number });
 

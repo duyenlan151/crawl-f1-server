@@ -6,23 +6,32 @@ import './websocket/server';
 import { logger } from './utils/logger';
 
 const app = express();
+const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
 
+// app.get('/', (req, res) => {
+//   res.send('Hello, this is the home route!');
+// });
+
 app.use('/', routes);
 
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error(`Unhandled error: ${err.message}`);
-  res.status(500).json({ message: 'Internal Server Error' });
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-if (env.NODE_ENV === 'development') {
-  app.listen(env.PORT, () => {
-    logger.info(`Express server running on port ${env.PORT}`);
-    console.log(`Express server running on port ${env.PORT}`);
-  });
-}
+// app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+//   logger.error(`Unhandled error: ${err.message}`);
+//   res.status(500).json({ message: 'Internal Server Error' });
+// });
 
-logger.info(`WebSocket server running on ws://localhost:${env.WS_PORT}/crawl`);
-console.log(`WebSocket server running on ws://localhost:${env.WS_PORT}/crawl`);
+// if (env.NODE_ENV === 'development') {
+//   app.listen(env.PORT, () => {
+//     logger.info(`Express server running on port ${env.PORT}`);
+//     console.log(`Express server running on port ${env.PORT}`);
+//   });
+// }
+
+// logger.info(`WebSocket server running on ws://localhost:${env.WS_PORT}/crawl`);
+// console.log(`WebSocket server running on ws://localhost:${env.WS_PORT}/crawl`);
